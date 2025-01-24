@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>챗봇 응답</title>
+</head>
+<body>
+    <h1>챗봇의 답변</h1>
+    <p>사용자: {{ user_input }}</p>
+    <p>챗봇: {{ chatbot_reply }}</p>
+
+    <h2>대화 내용:</h2>
+    <ul>
+        {% for msg in conversation %}
+            <li><strong>{{ msg.role }}:</strong> {{ msg.content }}</li>
+        {% endfor %}
+    </ul>
+
+    <br>
+    <a href="{% url 'chat' %}">다시 대화하기</a>
+</body>
+</html>

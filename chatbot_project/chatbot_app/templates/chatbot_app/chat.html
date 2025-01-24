@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>TIL 챗봇 대화 입력</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // 대화 제출 시
+            $('#chat-form').on('submit', function(e) {
+                e.preventDefault(); // 폼 기본 제출 동작 막기
+
+                const user_input = $('#user_input').val();  // 사용자가 입력한 텍스트
+
+                // 서버로 AJAX 요청 보내기
+                $.ajax({
+                    type: 'POST',
+                    url: '{% url "response" %}',  // 'response' 뷰로 요청
+                    data: {
+                        'user_input': user_input,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}',  // CSRF 토큰
+                    },
+                    success: function(response) {
+                        // 성공 시 대화 내용 갱신
+                        const chatbot_reply = response.chatbot_reply;
+                        const conversation = response.conversation;
+
+                        // 대화 내용 HTML에 업데이트
+                        $('#conversation').empty();
+                        conversation.forEach(function(msg) {
+                            $('#conversation').append('<li><strong>' + msg.role + ':</strong> ' + msg.content + '</li>');
+                        });
+
+                        // 텍스트 입력창 초기화
+                        $('#user_input').val('');
+                    }
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <h1>TIL 챗봇과 대화하기</h1>
+    
+    <form id="chat-form">
+        <label for="user_input">오늘 배운 것 또는 중요한 경험을 입력하세요:(초기화 입력시 대화 초기화)</label><br>
+        <input type="text" id="user_input" name="user_input" required><br><br>
+        <button type="submit">보내기</button>
+    </form>
+
+    <h2>대화 내용:</h2>
+    <ul id="conversation">
+        {% for msg in conversation %}
+            <li><strong>{{ msg.role }}:</strong> {{ msg.content }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
